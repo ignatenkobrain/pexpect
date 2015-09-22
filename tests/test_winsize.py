@@ -31,7 +31,8 @@ class TestCaseWinsize(PexpectTestCase.PexpectTestCase):
                           .format(self=self), timeout=3)
         # default size by PtyProcess class is 24 rows by 80 columns.
         p.expect_exact('Initial Size: (24, 80)')
-        p.close()
+        p.sendcontrol('c')
+        p.wait()
 
     def test_initial_winsize_by_dimension(self):
         """ Assert user-parameter window dimension size is initial. """
@@ -39,7 +40,8 @@ class TestCaseWinsize(PexpectTestCase.PexpectTestCase):
                           .format(self=self), timeout=3,
                           dimensions=(40, 100))
         p.expect_exact('Initial Size: (40, 100)')
-        p.close()
+        p.sendcontrol('c')
+        p.wait()
 
     def test_setwinsize(self):
         """ Ensure method .setwinsize() sends signal caught by child. """
@@ -50,7 +52,8 @@ class TestCaseWinsize(PexpectTestCase.PexpectTestCase):
         p.expect_exact('READY')
         p.setwinsize(19, 84)
         p.expect_exact('SIGWINCH: (19, 84)')
-        p.close()
+        p.sendcontrol('c')
+        p.wait()
 
 if __name__ == '__main__':
     unittest.main()
