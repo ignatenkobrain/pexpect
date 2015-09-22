@@ -21,6 +21,7 @@ PEXPECT LICENSE
 import pexpect
 import unittest
 from . import PexpectTestCase
+from .utils import no_coverage_env
 import time
 
 class TestCaseWinsize(PexpectTestCase.PexpectTestCase):
@@ -28,32 +29,35 @@ class TestCaseWinsize(PexpectTestCase.PexpectTestCase):
     def test_initial_winsize(self):
         """ Assert initial window dimension size (24, 80). """
         p = pexpect.spawn('{self.PYTHONBIN} sigwinch_report.py'
-                          .format(self=self), timeout=3)
+                          .format(self=self), timeout=3,
+                          env=no_coverage_env())
         # default size by PtyProcess class is 24 rows by 80 columns.
         p.expect_exact('Initial Size: (24, 80)')
         p.sendcontrol('c')
-        p.wait()
+        p.expect(pexpect.EOF)
 
     def test_initial_winsize_by_dimension(self):
         """ Assert user-parameter window dimension size is initial. """
         p = pexpect.spawn('{self.PYTHONBIN} sigwinch_report.py'
                           .format(self=self), timeout=3,
-                          dimensions=(40, 100))
+                          dimensions=(40, 100),
+                          env=no_coverage_env())
         p.expect_exact('Initial Size: (40, 100)')
         p.sendcontrol('c')
-        p.wait()
+        p.expect(pexpect.EOF)
 
     def test_setwinsize(self):
         """ Ensure method .setwinsize() sends signal caught by child. """
         p = pexpect.spawn('{self.PYTHONBIN} sigwinch_report.py'
-                          .format(self=self), timeout=3)
+                          .format(self=self), timeout=3,
+                          env=no_coverage_env())
         # Note that we must await the installation of the child process'
         # signal handler,
         p.expect_exact('READY')
         p.setwinsize(19, 84)
         p.expect_exact('SIGWINCH: (19, 84)')
         p.sendcontrol('c')
-        p.wait()
+        p.expect(pexpect.EOF)
 
 if __name__ == '__main__':
     unittest.main()
